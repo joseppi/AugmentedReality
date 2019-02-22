@@ -171,43 +171,62 @@ for i in range(0, 5):  # rows
 
 num_to_sum3 = num_to_sum3/9
 
-print(matrix8)
+# print(matrix8)
 
 # 15. Create an array of 5x5 random values and return the value that is closer to 0.5
-matrix9 = np.arange(0,25)
-num3 = matrix9.flat
-num3 = np.abs(mat)
+# matrix9 = np.arange(0,25)
+# num3 = matrix9.flat
+# num3 = np.abs(matrix9)
 
 # 16. Make a 3x3 matrix of random numbers from 0 to 10 and count how many of them are > 5
-matRand4 = np.random.randint(0,10,9).reshape(3,3)
-vec4 = motRand4.reshape(9)
-len(vec4[vec4 > 5])
+# matRand4 = np.random.randint(0,10,9).reshape(3,3)
+# vec4 = matRand4.reshape(9)
+# vec4[vec4 > 5]
 
 # 17. Create a horizontal gradient image of 64x64 that goes from black to white
-# Load an image in grayscale
-# img = np.zeros(64,64,3),np.uint8
-#
-# cv2.imshow('ellie',img)
-#
-# k = cv2.waitKey(0)
-#
-# if k == 27:
-#     # Wait for ESC key to exit
-#     cv2.destroyAllWindows()
-# elif k == ord('s'):
-#     # Wait for 's' key to save and exit
-#     cv2.imwrite('Ellie-grayscale.jpg',img)
-#     cv2.destroyAllWindows()
+# Load an image in something
+
+mat = np.zeros((64, 64))
+gradient = np.arange(0.0, 64.0)
+gradient = gradient / 63.0# with this the gradient goes from 0 to 1
+gradient = gradient * 255.0
+mat += gradient
+mat = np.uint8(mat)
+# cv2.imshow("gradient", mat)
+
 
 # 18. Create a vertical gradient image of 64x64 that goes from black to white
+mat2 = np.zeros((64, 64))
+gradient2 = np.arange(0.0, 64.0)
+gradient2 = gradient2 / 63.0 # with this the gradient goes from 0 to 1
+gradient2 = gradient2 * 255.0
+
+mat2 += gradient2
+mat2 = mat2.transpose()
+mat2 = np.uint8(mat2)
+
+# cv2.imshow("gradient2", mat2)
 
 # 19. Create a 3-component white image of 64x64 pixels and set the blue component to zero
 # (the result should be yellow)
+yellow_img = np.uint8(np.ones((64, 64, 3)))  # bgr
+yellow_img[0:, 0:, 0] = 0
+yellow_img *= 255
+
+#  cv2.imshow("Yellow", yellow_img)
 
 # 20. Create a 3-component white image of 64x64 pixels, set the blue component of the
 # top-left part to zero (the result should be yellow) and the red component of the
 # bottom-right part to zero (the result should be cyan
+yellow_img = np.uint8(np.ones((64, 64, 3)))  # bgr
+yellow_img[0:32, 0:32, 0] = 0
+yellow_img[32:64, 32:64, 2] = 0
+yellow_img *= 255
+
+cv2.imshow("Yellow", yellow_img)
 
 # 21. Open an image and insert black horizontal scan lines at 50%
 
 # 22. Open an image and insert black vertical scan lines at 50%
+
+cv2.waitKey(0)
