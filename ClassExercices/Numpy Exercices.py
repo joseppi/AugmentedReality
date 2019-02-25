@@ -223,10 +223,20 @@ yellow_img[0:32, 0:32, 0] = 0
 yellow_img[32:64, 32:64, 2] = 0
 yellow_img *= 255
 
-cv2.imshow("Yellow", yellow_img)
+#  cv2.imshow("Yellow", yellow_img)
 
 # 21. Open an image and insert black horizontal scan lines at 50%
+yellow_img = np.uint8(np.ones((64, 64, 3)))  # bgr
+yellow_img[:, ::2, :] = [0, 0, 0]
+yellow_img *= 255
+
+#  cv2.imshow("Yellow", yellow_img)
 
 # 22. Open an image and insert black vertical scan lines at 50%
+yellow_img = np.uint8(np.ones((64, 64, 3)))  # bgr
+yellow_img[::2, :, :] = [0, 0, 0]
+yellow_img *= 255
+
+cv2.imshow("Yellow", yellow_img)
 
 cv2.waitKey(0)
