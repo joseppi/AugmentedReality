@@ -10,10 +10,3 @@ cv2.imshow('ellie', img)
 
 k = cv2.waitKey(0)
 
-if k == 27:
-    # Wait for ESC key to exit
-    cv2.destroyAllWindows()
-elif k == ord('s'):
-    # Wait for 's' key to save and exit
-    cv2.imwrite('Ellie-grayscale3.jpg',img)
-    cv2.destroyAllWindows()
