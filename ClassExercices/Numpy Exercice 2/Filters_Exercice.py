@@ -71,44 +71,101 @@ import cv2
 #         blur3[i, y] = pixel
 # # cv2.imshow('Image', np.uint8(blur * 255.0))
 
-# -------------------Median Filter----------------------------
-img4 = cv2.imread('lenna_noise.png', cv2.IMREAD_GRAYSCALE)
-columns, rows = img4.shape
-print(rows, columns)
-Gx = np.zeros(shape=(rows, columns))
+# -------------------Canny Edge Detector Filter----------------------------
+img4 = cv2.imread('../img/eagle.jpg', cv2.IMREAD_GRAYSCALE)
+rows, columns = img4.shape
+# ___BLUR___
+blur4 = np.zeros(shape=(rows, columns))
 
+kernel_blur = np.zeros((4, 4))
+kernel_blur[0:4, 0:4] = 1.0/9.0
+
+for i in range(1, rows - 2):
+    for j in range(1, columns - 2):
+        temp = img4[i-1:i+3, j-1:j+3] * kernel_blur
+        pixel = temp.sum()
+        blur4[i, j] = pixel
+
+print("Finished Blur")
+
+# __Direction data Init___
+pixel_x = np.zeros(shape=(rows, columns))
+pixel_y = np.zeros(shape=(rows, columns))
+
+
+D = np.zeros(shape=(rows, columns))
+
+# __SOBEL___
+Gx = np.zeros(shape=(rows, columns))
 Gy = np.zeros(shape=(rows, columns))
 
-kernel_horizontal = np.array([[-3, 0, 3],
-                             [-10, 0, 10],
-                             [-3, 0, 3]])
+kernel_horizontal = np.array([[-1, 0, 1],
+                             [-2, 0, 2],
+                             [-1, 0, 1]])
 
-kernel_vertical = np.zeros((3, 3))
-kernel_vertical[0, 0] = -3
-kernel_vertical[0, 1] = -10
-kernel_vertical[0, 2] = -3
+kernel_vertical = np.array([[-1, -2, -1],
+                             [0, 0, 0],
+                             [1, 2, 1]])
 
-kernel_vertical[1, 0] = 0
-kernel_vertical[1, 1] = 0
-kernel_vertical[1, 2] = 0
+rows = rows - 1
+columns = columns - 1
 
-kernel_vertical[2, 0] = 3
-kernel_vertical[2, 1] = 10
-kernel_vertical[2, 2] = 3
-
-for i in range(1, rows - 1):
-    for j in range(1, columns - 1):
-        temp = img4[i-1:i+2, j-1:j+2] * kernel_horizontal  # Create a temporal matrix that stores the result of the multiplication of the kernel and the image.
+# ___X___
+for i in range(1, rows):
+    for j in range(1, columns):
+        temp = blur4[i-1:i+2, j-1:j+2] * kernel_horizontal  # Create a temporal matrix that stores the result of the multiplication of the kernel and the image.
         pixel = temp.sum()  # Sum Everything inside that temporal matrix and create a pixel with the result
+        pixel_x[i, j] = pixel
         Gx[i, j] = pixel  # Add the resulting pixel to a matrix called Gx
 
-for i in range(1, rows - 1):
-    for j in range(1, columns - 1):
-        temp = img4[i-1:i+2, j-1:j+2] * kernel_vertical
+print("Finished Gx")
+
+# ___Y___
+for i in range(1, rows):
+    for j in range(1, columns):
+        temp = blur4[i-1:i+2, j-1:j+2] * kernel_vertical
         pixel = temp.sum()
+        pixel_y[i, j] = pixel
         Gy[i, j] = pixel
 
+print("Finished Gy")
+
 G = np.sqrt(Gx**2 + Gy**2)
+
+# ___Direction___
+print("Starting Direction")
+# dir_list = [0,45,90,135]
+# for i in range(1, rows):
+#     for j in range(1, columns):
+#           degree = np.arctan2(pixel_x[i][j], pixel_y[i][j]) * 180 / 3.14159262359939
+#          if degree > 0.0 & degree < 45.0:
+#              if degree > 22.5:
+#                  D = 45.0
+#              else:
+#                  D = 0.0
+#          if degree > 45.0 & degree < 90.0:
+#              if degree > 67.5:
+#                  D = 90.0
+#              else:
+#                  D = 45.0
+#          if degree > 90.0 & degree < 135.0:
+#              if degree > 112.5:
+#                  D = 135.0
+#              else:
+#                  D = 90.0
+
+
+
+
+
+
+print(D)
+
+print("Finish Direction")
+
+
+#  Show Images
+cv2.imshow('Blur', np.uint8(blur4))
 cv2.imshow('Gx', np.uint8(Gx))
 cv2.imshow('Gy', np.uint8(Gy))
 cv2.imshow('Final image', np.uint8(G))
