@@ -72,8 +72,9 @@ import cv2
 # # cv2.imshow('Image', np.uint8(blur * 255.0))
 
 # -------------------Canny Edge Detector Filter----------------------------
-img4 = cv2.imread('../img/eagle.jpg', cv2.IMREAD_GRAYSCALE)
+img4 = cv2.imread('../img/sonic.jpg', cv2.IMREAD_GRAYSCALE)
 rows, columns = img4.shape
+canny = cv2.Canny(img4, columns, rows)
 # ___BLUR___
 blur4 = np.zeros(shape=(rows, columns))
 
@@ -93,22 +94,23 @@ pixel_x = np.zeros(shape=(rows, columns))
 pixel_y = np.zeros(shape=(rows, columns))
 
 
-D = np.zeros(shape=(rows, columns))
+D = np.zeros(shape=(rows, columns))  # Direction
+M = np.zeros(shape=(rows, columns))  # Maximum
 
 # __SOBEL___
 Gx = np.zeros(shape=(rows, columns))
 Gy = np.zeros(shape=(rows, columns))
 
-kernel_horizontal = np.array([[-1, 0, 1],
-                             [-2, 0, 2],
-                             [-1, 0, 1]])
-
-kernel_vertical = np.array([[-1, -2, -1],
-                             [0, 0, 0],
-                             [1, 2, 1]])
-
 rows = rows - 1
 columns = columns - 1
+
+kernel_horizontal = np.array([[-1, 0, 1],
+                              [-2, 0, 2],
+                              [-1, 0, 1]])
+
+kernel_vertical = np.array([[-1, -2, -1],
+                            [0, 0, 0],
+                            [1, 2, 1]])
 
 # ___X___
 for i in range(1, rows):
@@ -134,39 +136,71 @@ G = np.sqrt(Gx**2 + Gy**2)
 
 # ___Direction___
 print("Starting Direction")
-# dir_list = [0,45,90,135]
-# for i in range(1, rows):
-#     for j in range(1, columns):
-#           degree = np.arctan2(pixel_x[i][j], pixel_y[i][j]) * 180 / 3.14159262359939
-#          if degree > 0.0 & degree < 45.0:
-#              if degree > 22.5:
-#                  D = 45.0
-#              else:
-#                  D = 0.0
-#          if degree > 45.0 & degree < 90.0:
-#              if degree > 67.5:
-#                  D = 90.0
-#              else:
-#                  D = 45.0
-#          if degree > 90.0 & degree < 135.0:
-#              if degree > 112.5:
-#                  D = 135.0
-#              else:
-#                  D = 90.0
+# dir_list = [0, 45, 90, 135]
+for i in range(1, rows):
+    for j in range(1, columns):
+        degree = np.arctan2(pixel_x[i][j], pixel_y[i][j]) * 180 / 3.14159262359939
+        if 45.0 <= degree > 0.0:
+            if degree > 22.5:
+                D[i][j] = 45
+            else:
+                D[i][j] = 0
+        elif 90.0 <= degree > 45.0:
+            if degree > 67.5:
+                D[i][j] = 90
+            else:
+                D[i][j] = 45
+        elif 135.0 <= degree > 90.0:
+            if degree > 112.5:
+                D[i][j] = 135
+            else:
+                D[i][j] = 90
 
+for i in range(1, rows):
+    for j in range(1, columns):
+        if D[i][j] == 0:
+            left = G[i][j-1]
+            right = G[i][j+1]
+            if left > G[i][j] or right > G[i][j]:
+                M[i][j] = 0.0
+            else:
+                M[i][j] = 255.0
 
+        if D[i][j] == 45:
+            right_top = G[i+1][j+1]
+            left_down = G[i-1][j-1]
+            if right_top > G[i][j] or left_down > G[i][j]:
+                M[i][j] = 0
+            else:
+                M[i][j] = 255.0
 
+        if D[i][j] == 90:
+            top = G[i+1][j]
+            down = G[i-1][j]
+            #  print(top,down)
+            if top > G[i][j] or down > G[i][j]:
+                M[i][j] = 0
+            else:
+                M[i][j] = 255.0
 
-
-
-print(D)
+        if D[i][j] == 135:
+            top_left = G[i+1][j-1]
+            down_right = G[i-1][j+1]
+            if top_left > G[i][j] or down_right > G[i][j]:
+                M[i][j] = 0
+            else:
+                M[i][j] = 255.0
 
 print("Finish Direction")
 
 
 #  Show Images
+cv2.imshow('Original', img4)
 cv2.imshow('Blur', np.uint8(blur4))
 cv2.imshow('Gx', np.uint8(Gx))
 cv2.imshow('Gy', np.uint8(Gy))
-cv2.imshow('Final image', np.uint8(G))
+cv2.imshow('G', np.uint8(G))
+cv2.imshow('Final_image', np.uint8(M))
+cv2.imshow('Canny', canny)
+
 k = cv2.waitKey(0)
