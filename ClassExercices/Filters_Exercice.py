@@ -72,20 +72,24 @@ import cv2
 # # cv2.imshow('Image', np.uint8(blur * 255.0))
 
 # -------------------Canny Edge Detector Filter----------------------------
-img4 = cv2.imread('../img/sonic.jpg', cv2.IMREAD_GRAYSCALE)
+img4 = cv2.imread('img/sonic.jpg', cv2.IMREAD_GRAYSCALE)
+assert img4 is not None
 rows, columns = img4.shape
-canny = cv2.Canny(img4, columns, rows)
+print(rows,columns)
+canny = cv2.Canny(img4, 50, 100)
 # ___BLUR___
 blur4 = np.zeros(shape=(rows, columns))
 
-kernel_blur = np.zeros((4, 4))
-kernel_blur[0:4, 0:4] = 1.0/9.0
+kernel_blur = np.zeros((3, 3))
+kernel_blur[0:3, 0:3] = 1.0/9.0
 
-for i in range(1, rows - 2):
-    for j in range(1, columns - 2):
-        temp = img4[i-1:i+3, j-1:j+3] * kernel_blur
+for i in range(1, rows - 1):
+    for j in range(1, columns - 1):
+        temp = img4[i-1:i+2, j-1:j+2] * kernel_blur
         pixel = temp.sum()
         blur4[i, j] = pixel
+
+blur4 = cv2.GaussianBlur(img4, (3, 3), 1, 1)
 
 print("Finished Blur")
 
@@ -96,6 +100,7 @@ pixel_y = np.zeros(shape=(rows, columns))
 
 D = np.zeros(shape=(rows, columns))  # Direction
 M = np.zeros(shape=(rows, columns))  # Maximum
+FM = np.zeros(shape=(rows, columns))  # Final Max
 
 # __SOBEL___
 Gx = np.zeros(shape=(rows, columns))
@@ -104,13 +109,13 @@ Gy = np.zeros(shape=(rows, columns))
 rows = rows - 1
 columns = columns - 1
 
-kernel_horizontal = np.array([[-1, 0, 1],
-                              [-2, 0, 2],
-                              [-1, 0, 1]])
+kernel_horizontal = np.array([[1, 0, -1],
+                              [2, 0, -2],
+                              [1, 0, -1]])
 
-kernel_vertical = np.array([[-1, -2, -1],
+kernel_vertical = np.array([[1, 2, 1],
                             [0, 0, 0],
-                            [1, 2, 1]])
+                            [-1, -2, -1]])
 
 # ___X___
 for i in range(1, rows):
@@ -135,26 +140,35 @@ print("Finished Gy")
 G = np.sqrt(Gx**2 + Gy**2)
 
 # ___Direction___
-print("Starting Direction")
 # dir_list = [0, 45, 90, 135]
 for i in range(1, rows):
     for j in range(1, columns):
-        degree = np.arctan2(pixel_x[i][j], pixel_y[i][j]) * 180 / 3.14159262359939
-        if 45.0 <= degree > 0.0:
+        rad = np.arctan2(pixel_x[i][j], pixel_y[i][j])
+        degree = rad * 180 / np.pi
+        if degree < 0:
+            degree = degree + 180
+
+        if 45.0 > degree >= 0.0:
             if degree > 22.5:
                 D[i][j] = 45
             else:
                 D[i][j] = 0
-        elif 90.0 <= degree > 45.0:
+        if 90.0 > degree >= 45.0:
             if degree > 67.5:
                 D[i][j] = 90
             else:
                 D[i][j] = 45
-        elif 135.0 <= degree > 90.0:
+        if 135.0 > degree >= 90.0:
             if degree > 112.5:
                 D[i][j] = 135
             else:
                 D[i][j] = 90
+        if 180 >= degree >= 135.0:
+            if degree > 157.5:
+                D[i][j] = 0
+            else:
+                D[i][j] = 135
+print("Finish Direction")
 
 for i in range(1, rows):
     for j in range(1, columns):
@@ -164,43 +178,52 @@ for i in range(1, rows):
             if left > G[i][j] or right > G[i][j]:
                 M[i][j] = 0.0
             else:
-                M[i][j] = 255.0
+                M[i][j] = G[i][j]
 
         if D[i][j] == 45:
             right_top = G[i+1][j+1]
             left_down = G[i-1][j-1]
-            if right_top > G[i][j] or left_down > G[i][j]:
-                M[i][j] = 0
+            if right_top >= G[i][j] or left_down >= G[i][j]:
+                M[i][j] = 0.0
             else:
-                M[i][j] = 255.0
+                M[i][j] = G[i][j]
 
         if D[i][j] == 90:
             top = G[i+1][j]
             down = G[i-1][j]
-            #  print(top,down)
-            if top > G[i][j] or down > G[i][j]:
-                M[i][j] = 0
+            if top >= G[i][j] or down >= G[i][j]:
+                M[i][j] = 0.0
             else:
-                M[i][j] = 255.0
+                M[i][j] = G[i][j]
 
         if D[i][j] == 135:
             top_left = G[i+1][j-1]
             down_right = G[i-1][j+1]
-            if top_left > G[i][j] or down_right > G[i][j]:
-                M[i][j] = 0
+            if top_left >= G[i][j] or down_right >= G[i][j]:
+                M[i][j] = 0.0
             else:
-                M[i][j] = 255.0
-
-print("Finish Direction")
+                M[i][j] = G[i][j]
+print("Finish Max")
+# Thresh Hold
+for i in range(1, rows):
+    for j in range(1, columns):
+        if M[i][j] < 50.0:
+            FM[i][j] = 0.0
+        if M[i][j] > 150.0:
+            FM[i][j] = 255.0
+        if 150.0 < M[i][j] > 50.0:
+            kernel_treshhold = img4[i-1:i+2,j-1:j+2]
+            if kernel_treshhold.max() > 150.0:
+                FM[i][j] = 255.0
+            else:
+                FM[i][j] = 0
 
 
 #  Show Images
-cv2.imshow('Original', img4)
-cv2.imshow('Blur', np.uint8(blur4))
-cv2.imshow('Gx', np.uint8(Gx))
-cv2.imshow('Gy', np.uint8(Gy))
 cv2.imshow('G', np.uint8(G))
-cv2.imshow('Final_image', np.uint8(M))
+cv2.imshow('D', np.uint8(D))
+cv2.imshow('M', np.uint8(M))
+cv2.imshow('Final_image', np.uint8(FM))
 cv2.imshow('Canny', canny)
 
 k = cv2.waitKey(0)
