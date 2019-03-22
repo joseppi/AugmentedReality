@@ -75,8 +75,9 @@ import cv2
 img4 = cv2.imread('img/sonic.jpg', cv2.IMREAD_GRAYSCALE)
 assert img4 is not None
 rows, columns = img4.shape
-print(rows,columns)
+print(rows, columns)
 canny = cv2.Canny(img4, 50, 100)
+
 # ___BLUR___
 blur4 = np.zeros(shape=(rows, columns))
 
@@ -89,7 +90,7 @@ for i in range(1, rows - 1):
         pixel = temp.sum()
         blur4[i, j] = pixel
 
-blur4 = cv2.GaussianBlur(img4, (3, 3), 1, 1)
+#  blur4 = cv2.GaussianBlur(img4, (3, 3), 1, 1)
 
 print("Finished Blur")
 
@@ -143,43 +144,49 @@ G = np.sqrt(Gx**2 + Gy**2)
 # dir_list = [0, 45, 90, 135]
 for i in range(1, rows):
     for j in range(1, columns):
-        rad = np.arctan2(pixel_x[i][j], pixel_y[i][j])
+        rad = np.arctan2(pixel_y[i][j], pixel_x[i][j])
         degree = rad * 180 / np.pi
         if degree < 0:
             degree = degree + 180
 
         if 45.0 > degree >= 0.0:
             if degree > 22.5:
-                D[i][j] = 45
+                D[i][j] = 45.0
             else:
-                D[i][j] = 0
+                D[i][j] = 0.0
         if 90.0 > degree >= 45.0:
             if degree > 67.5:
-                D[i][j] = 90
+                D[i][j] = 90.0
             else:
-                D[i][j] = 45
+                D[i][j] = 45.0
         if 135.0 > degree >= 90.0:
             if degree > 112.5:
-                D[i][j] = 135
+                D[i][j] = 135.0
             else:
-                D[i][j] = 90
+                D[i][j] = 90.0
         if 180 >= degree >= 135.0:
             if degree > 157.5:
-                D[i][j] = 0
+                D[i][j] = 0.0
             else:
-                D[i][j] = 135
+                D[i][j] = 135.0
 print("Finish Direction")
 
 for i in range(1, rows):
     for j in range(1, columns):
-        if D[i][j] == 0:
+        if D[i][j] == 0:#
             left = G[i][j-1]
             right = G[i][j+1]
             if left > G[i][j] or right > G[i][j]:
                 M[i][j] = 0.0
             else:
                 M[i][j] = G[i][j]
-
+        if D[i][j] == 90:
+            top = G[i-1][j]
+            down = G[i+1][j]
+            if top > G[i][j] or down > G[i][j]:
+                M[i][j] = 0.0
+            else:
+                M[i][j] = G[i][j]
         if D[i][j] == 45:
             right_top = G[i+1][j+1]
             left_down = G[i-1][j-1]
@@ -187,15 +194,6 @@ for i in range(1, rows):
                 M[i][j] = 0.0
             else:
                 M[i][j] = G[i][j]
-
-        if D[i][j] == 90:
-            top = G[i+1][j]
-            down = G[i-1][j]
-            if top >= G[i][j] or down >= G[i][j]:
-                M[i][j] = 0.0
-            else:
-                M[i][j] = G[i][j]
-
         if D[i][j] == 135:
             top_left = G[i+1][j-1]
             down_right = G[i-1][j+1]
@@ -212,14 +210,15 @@ for i in range(1, rows):
         if M[i][j] > 150.0:
             FM[i][j] = 255.0
         if 150.0 < M[i][j] > 50.0:
-            kernel_treshhold = img4[i-1:i+2,j-1:j+2]
-            if kernel_treshhold.max() > 150.0:
+            kernel_threshold = img4[i - 1:i + 2, j - 1:j + 2]
+            if kernel_threshold.max() > 150.0:
                 FM[i][j] = 255.0
             else:
                 FM[i][j] = 0
 
 
 #  Show Images
+cv2.imshow('Original', np.uint8(img4))
 cv2.imshow('G', np.uint8(G))
 cv2.imshow('D', np.uint8(D))
 cv2.imshow('M', np.uint8(M))
