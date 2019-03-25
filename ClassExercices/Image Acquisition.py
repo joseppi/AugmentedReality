@@ -3,7 +3,7 @@ import cv2
 
 # Load an image in grayscale
 img = cv2.imread('Ellie.jpg',0)
-cv2.imshow('ellie',img)
+cv2.imshow('ellie', img)
 
 k = cv2.waitKey(0)
 
