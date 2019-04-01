@@ -1,0 +1,99 @@
+<html>
+    <head>
+        <title>User-defined objects</title>
+        <script type="text/javascript" src="filename.js"></script>
+        <script type="text/javascript">
+            function sayHello()
+            {
+                alert("Hello World")
+            }
+            function addPrice(amount)
+            {
+                this.price = amount;
+            }
+            function book(title, author)
+            {
+                this.title = title;
+                this.author = author;
+                this.addPrice = addPrice;
+            }
+            function validate()
+            {
+                if(document.myForm.Name.value == "")
+                {
+                    alert("Please provide your name!");
+                    return false;            
+                }
+                else
+                {
+                    document.write(document.myForm.Name.value)
+                    return true;
+                }
+            }
+        </script>
+        <script language="javascript" type="text/javascript">
+            document.write("Hello World")    
+            // This is a comment. It is similar to comments in C++
+            var1 = 10
+            var2 = 20
+            var name="Ali"; 
+            var money;
+            money = 2000.50;
+            var myVar = "global";
+            function checkscope()
+            {
+                var myVar = "local";
+                document.write(myVar);
+            }
+            function validate()
+            {
+                if(document.myForm.Name.value == "")
+                {
+                    alert("Please provide your name!");
+                    return false;
+                }
+                else
+                {
+                    document.write(document.myForm.Name.value)
+                    return true;
+                }
+            }
+            var count = 0;
+            document.write("Starting Loop" + count + "<br />");
+            do
+            {
+                document.write("Current Count : " + count + "<br />");
+                count++;
+            }
+            while(count <5);
+            document.write("Loop stopped!");
+            
+        </script>        
+    </head>
+
+    <body>        
+        <p>This is web page body </p>
+        <script type="text/javascript">
+            document.write("Hello World")
+            var myBook = new book("Perl", "Mohtashim");
+            myBook.addPrice(100);
+
+            document.write("Book title is : " + myBook.title + "<br>");
+            document.write("Book author is : " + myBook.author + "<br>");
+            document.write("Book price is : " + myBook.price + "<br>");
+
+            var arr = new Array(20, 10, 30);
+            document.write("arr is : " + arr + "<br>");
+            document.write("arr.length is : " + arr.length + "<br>");
+            document.write("arr is sorted is : " + arr.sort(arr) + "<br>");
+
+        </script>        
+        <form name="myForm" onsumbit="return(validate());">
+            <tr>
+                <td align="right">Name</td>
+                <td><input type="text" name="Name" ></td>
+            </tr>
+        </form>
+        <input type="button" onclick="sayHello()" value="Say Hello" />        
+    </body>
+</html>
