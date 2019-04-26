@@ -101,7 +101,7 @@
                 gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
                 
                 shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, "aColor");
-                gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
+                gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);                
 
                 shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
                 shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");                
@@ -124,6 +124,7 @@
 
             
             function loadSceneOnGPU() {
+                
                 //TRIANGLE
                 triangleVertexPositionBuffer = gl.createBuffer();
 
@@ -229,11 +230,11 @@
                 
                 /*-----------------ALLSCREEN----------------*/
                 //Quad
-                mat4.identity(mvMatrix);
-
-                mat4.translate(mvMatrix, [0.0, 0.0, -10.0]);
-                mat4.rotate(mvMatrix, 3.1415*1.0,[0.0,0.0,1.0]);
-                mat4.scale(mvMatrix,[10,5,10]);
+                //mat4.identity(mvMatrix);
+//
+                //mat4.translate(mvMatrix, [0.0, 0.0, -10.0]);
+                //mat4.rotate(mvMatrix, 3.1415*1.0,[0.0,0.0,1.0]);
+                //mat4.scale(mvMatrix,[10,5,10]);
 
                         
                 //vertex buffer  
