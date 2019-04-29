@@ -10,11 +10,14 @@
             attribute vec3 aVertexPosition; //Position attribute of each vertex
             attribute vec2 aVertexTexCoords; //Texture Coordinate attribute of each vertex.
 
+            uniform mat4 uMVMatrix;
+            uniform mat4 uPMatrix;
+
             varying vec2 texCoords;
 
             void main(void) {
                 texCoords = aVertexTexCoords;
-                gl_Position = vec4(aVertexPosition, 1.0);
+                gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
             }
         </script>
         
@@ -102,7 +105,10 @@
                 shaderProgram.vertexTexCoordAttribute = gl.getAttribLocation(shaderProgram, "aVertexTexCoords");
                 gl.enableVertexAttribArray(shaderProgram.vertexTexCoordAttribute); 
 
-                shaderProgram.colorMapUniform = gl.getUniformLocation(shaderProgram, "colorTex");                                              
+                shaderProgram.colorMapUniform = gl.getUniformLocation(shaderProgram, "colorTex");   
+
+                shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
+                shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");                                            
               
             }
 
@@ -113,11 +119,18 @@
                 gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
                 gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);                
             }
-            
+            var triangleVertexPositionBuffer;
+            var triangleVertexTexCoordsBuffer;
+
             var quadVertexPositionBuffer;
             var quadVertexTexCoordsBuffer;
 
             function loadSceneOnGPU() {
+                //TRIANGLE POSITIONS
+                //triangleVertexPositionBuffer = gl.createBuffer();
+
+                
+
                 //QUAD POSITIONS
                 quadVertexPositionBuffer = gl.createBuffer();
 
@@ -125,14 +138,14 @@
                   
                 var positions = [
                      //up-right    
-                     -1.0, 1.0, 0.0,
-                     -1.0, -1.0, 0.0,
-                     1.0, -1.0, 0.0,
+                     -1.0, 1.0, 0.0,  //top-left
+                     -1.0, -1.0, 0.0, //bot-left
+                     1.0, -1.0, 0.0, //bot-right
 
                      //low-left
-                     -1.0, 1.0, 0.0,
-                     1.0, 1.0, 0.0,
-                     1.0, -1.0, 0.0 
+                     -1.0, 1.0, 0.0, //top-left
+                     1.0, 1.0, 0.0, //top-right
+                     1.0, -1.0, 0.0 //bot-right
                     ];   
                 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);         
                 
@@ -146,13 +159,13 @@
                   
                 var texcoords = [
                      //up-right    
-                     0.0, 1.0,
-                     0.0, 0.0,
+                     0.5, 0.5,
+                     0.5, 0.0,
                      1.0, 0.0,
 
                      //low-left
-                     0.0, 1.0,
-                     1.0, 1.0,
+                     0.5, 0.5,
+                     1.0, 0.5,
                      1.0, 0.0
                     ];   
                 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texcoords), gl.STATIC_DRAW);         
@@ -183,15 +196,17 @@
             function drawScene(canvas) {
                 gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
                 gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-                
-                /*-----------------ALLSCREEN----------------*/
+
+                mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
+                /*-----------------QUAD----------------*/
                 //Quad
                 mat4.identity(mvMatrix);
-                        
+                mat4.translate(mvMatrix, [1.5, 0.0, -4.0]);
+
                 //position buffer  
                 gl.bindBuffer(gl.ARRAY_BUFFER, quadVertexPositionBuffer);
                 gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, quadVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
+                
                 //texcoord buffer
                 gl.bindBuffer(gl.ARRAY_BUFFER, quadVertexTexCoordsBuffer);
                 gl.vertexAttribPointer(shaderProgram.vertexTexCoordAttribute, quadVertexTexCoordsBuffer.itemSize, gl.FLOAT, false, 0, 0);
