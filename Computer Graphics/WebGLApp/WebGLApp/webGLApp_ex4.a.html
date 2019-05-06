@@ -241,19 +241,29 @@
                 mvMatrix = mvMatrixStack.pop();
             }
             var fov = 45;
+            var zNear = 0.1;
+            var zFar = 150.0;
+            var dist = 1.0;
+            var panx = 0;
+            var pany = 0;
+
+            var mouseRotationMatrix = mat4.create();
+            var viewMatrix = mat4.create();
+
             function drawScene(canvas) {
                 gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
                 gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
                 mat4.perspective(fov, gl.viewportWidth / gl.viewportHeight, zNear, zFar, pMatrix);
 
-                mat4.identity(mvMatrix);
-                mat4.translate(mvMatrix,[0.0,0.0,-dist]);
-                mat4.multiply(mvMatrix,mouseRotationMatrix);
+                mat4.identity(viewMatrix);
+                mat4.translate(viewMatrix,[panx,pany,-dist]);                
+                mat4.multiply(viewMatrix,mouseRotationMatrix);
 
                 /*-----------------QUAD----------------*/
                 //position matrix
                 mat4.identity(mvMatrix);
+                mat4.multiply(mvMatrix,viewMatrix);
                 mat4.translate(mvMatrix, [1.5, 0.0, -5.0]);
 
                 //position buffer  
@@ -269,6 +279,7 @@
                 /*-----------------TRIANGLE----------------*/
                 //position matrix
                 mat4.identity(mvMatrix);
+                mat4.multiply(mvMatrix,viewMatrix);
                 mat4.translate(mvMatrix, [-1.5, -0.5, -5.0]);
 
                 //position buffer
@@ -289,28 +300,13 @@
                 gl.drawArrays(gl.TRIANGLES, 0, triangleVertexPositionBuffer.numItems); 
 
                 mvPushMatrix();
-                mat4.translate(mvMatrix, [1.2, 0.0, 0.0]);
+                
                 sendMatricesToShader();
 
                 mvPopMatrix();
         
             }
 
-            function handleKeys() {
-                if (currentlyPressedKeys[38]){
-                    //Up cursor up
-                    
-                    
-                    //Tasks to perform
-
-                }
-
-                if (currentlyPressedKeys[40]){
-                    //Down cursor key
-
-                    //Tasks to perform
-                }
-            }
             function renderingLoop(){
                 requestAnimationFrame(renderingLoop);
                 handleKeys();
@@ -320,16 +316,32 @@
             //Dictionary to manage key events
             var currentlyPressedKeys = {};
 
+            function handleKeys() {
+                if (currentlyPressedKeys[38]){
+                    //Up cursor up                    
+                    currentlyPressedKeys[38] = false;
+                    pany = pany + 0.1;
+                    //Tasks to perform
+
+                }
+
+                if (currentlyPressedKeys[40]){
+                    //Down cursor key
+                    currentlyPressedKeys[40] = false;
+                    pany = pany - 0.1;
+                    //Tasks to perform
+                }
+            }
+
             var lastMouseX = null;
             var lastMouseY = null;
             var mouseDown = false;
 
             function handleMouseDown(event) {
                 mouseDown = true;
-
                 if(event.button == 0)
                 {
-                    //Left button
+                    //Left button                
 
                     //Tasks to do
                 }
@@ -337,14 +349,14 @@
                 lastMouseX = event.clientX;
                 lastMouseY = event.clientY;
             }
-            var mouseRotationMatrix = mat4.create();
+
             mat4.identity(mouseRotationMatrix);
 
             function handleMouseMove(event) {
                 if (!mouseDown){
                     return;
                 }
-
+            
                 var newX = event.clientX;
                 var newY = event.clientY;
                 var deltaX = newX - lastMouseX;
@@ -373,7 +385,7 @@
                 if(event.button == 0)
                 {
                     //Left button
-
+     
                     //Tasks to do
                 }
                 
@@ -394,7 +406,7 @@
 
                 //Key Events
                 document.onkeydown = handleKeyDown;
-                document.onkeyup = handleKeyUp;                
+                document.onkeyup = handleKeyUp;         
                 document.onmouseup = handleMouseUp;
                 document.onmousemove = handleMouseMove;
 
