@@ -243,11 +243,12 @@
             var fov = 45;
             var zNear = 0.1;
             var zFar = 150.0;
-            var dist = 1.0;
+            var dist = 10.0;
             var panx = 0;
             var pany = 0;
 
             var mouseRotationMatrix = mat4.create();
+            var newPositionMatrix = mat4.create();
             var viewMatrix = mat4.create();
 
             function drawScene(canvas) {
@@ -257,14 +258,15 @@
                 mat4.perspective(fov, gl.viewportWidth / gl.viewportHeight, zNear, zFar, pMatrix);
 
                 mat4.identity(viewMatrix);
-                mat4.translate(viewMatrix,[panx,pany,-dist]);                
-                mat4.multiply(viewMatrix,mouseRotationMatrix);
+                mat4.translate(viewMatrix,[panx, 0, -dist]);                
+                mat4.multiply(viewMatrix, mouseRotationMatrix);
+                
 
                 /*-----------------QUAD----------------*/
                 //position matrix
                 mat4.identity(mvMatrix);
                 mat4.multiply(mvMatrix,viewMatrix);
-                mat4.translate(mvMatrix, [1.5, 0.0, -5.0]);
+                mat4.translate(mvMatrix, [1.5, 0.0, 0.0]);
 
                 //position buffer  
                 gl.bindBuffer(gl.ARRAY_BUFFER, quadVertexPositionBuffer);
@@ -280,7 +282,7 @@
                 //position matrix
                 mat4.identity(mvMatrix);
                 mat4.multiply(mvMatrix,viewMatrix);
-                mat4.translate(mvMatrix, [-1.5, -0.5, -5.0]);
+                mat4.translate(mvMatrix, [-1.5, -0.5, 0.0]);
 
                 //position buffer
                 gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
@@ -315,21 +317,26 @@
 
             //Dictionary to manage key events
             var currentlyPressedKeys = {};
-
+            var cam_speed = 0.1;
             function handleKeys() {
-                if (currentlyPressedKeys[38]){
-                    //Up cursor up                    
-                    currentlyPressedKeys[38] = false;
-                    pany = pany + 0.1;
-                    //Tasks to perform
-
+                //KeyCode = "w"
+                if (currentlyPressedKeys[87]){
+                    dist = dist - cam_speed;
                 }
 
-                if (currentlyPressedKeys[40]){
-                    //Down cursor key
-                    currentlyPressedKeys[40] = false;
-                    pany = pany - 0.1;
-                    //Tasks to perform
+                //KeyCode = "a"
+                if (currentlyPressedKeys[65]){                 
+                    panx = panx + cam_speed;
+                }
+
+                //KeyCode = "s"
+                if (currentlyPressedKeys[83]){
+                    dist = dist + cam_speed;                
+                }
+
+                //KeyCode = "d"
+                if (currentlyPressedKeys[68]){
+                    panx = panx - cam_speed;
                 }
             }
 
@@ -341,8 +348,8 @@
                 mouseDown = true;
                 if(event.button == 0)
                 {
-                    //Left button                
-
+                    //Left button                                                        
+          
                     //Tasks to do
                 }
 
@@ -351,7 +358,10 @@
             }
 
             mat4.identity(mouseRotationMatrix);
-
+            function deg2Rad(degrees){
+                return degrees * (Math.PI / 180);
+            }
+            var distancemat = mat4.create();
             function handleMouseMove(event) {
                 if (!mouseDown){
                     return;
@@ -365,8 +375,8 @@
                 var newRotationMatrix = mat4.create();
                 mat4.identity(newRotationMatrix);
                 mat4.rotate(newRotationMatrix, deg2Rad(deltaX / 10),[0, 1, 0]);
-                mat4.rotate(newRotationMatrix, deg2Rad(deltaY / 10),[1, 0, 0]);
-                mat4.multiply(newRotationMatrix, mouseRotationMatrix, mouseRotationMatrix);
+                mat4.rotate(newRotationMatrix, deg2Rad(deltaY / 10),[1, 0, 0]);                                
+                mat4.multiply(newRotationMatrix, mouseRotationMatrix, mouseRotationMatrix);                
 
                 lastMouseX = newX;
                 lastMouseY = newY;
@@ -377,6 +387,7 @@
 
                     //Tasks to do
                 }
+
             }
 
             function handleMouseUp(event) {
@@ -385,7 +396,7 @@
                 if(event.button == 0)
                 {
                     //Left button
-     
+                    
                     //Tasks to do
                 }
                 
@@ -402,13 +413,15 @@
                 var canvas = document.getElementById("webGL-canvas");
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
-                canvas.onmousedown = handleMouseDown;
+
 
                 //Key Events
                 document.onkeydown = handleKeyDown;
-                document.onkeyup = handleKeyUp;         
-                document.onmouseup = handleMouseUp;
+                document.onkeyup = handleKeyUp; 
+                canvas.onmousedown = handleMouseDown;        
                 document.onmousemove = handleMouseMove;
+                document.onmouseup = handleMouseUp;
+
 
                 initGL(canvas);
                 initShaders();
