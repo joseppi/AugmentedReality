@@ -121,35 +121,35 @@
             }
 
 
-            var modelVertexNormalBuffer;
-            var modelVertexTextureCoordBuffer;
-            var modelVertexPositionBuffer;
-            var modelVertexIndexBuffer;
+            var modelTeapotVertexNormalBuffer;
+            var modelTeapotVertexTextureCoordBuffer;
+            var modelTeapotVertexPositionBuffer;
+            var modelTeapotVertexIndexBuffer;
 
-            function handleLoadedModel(modelData){                
-                modelVertexNormalBuffer = gl.createBuffer();
-                gl.bindBuffer(gl.ARRAY_BUFFER, modelVertexNormalBuffer);
+            function handleLoadedModelTeapot(modelData){                
+                modelTeapotVertexNormalBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, modelTeapotVertexNormalBuffer);
                 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(modelData.vertexNormals),gl.STATIC_DRAW);
-                modelVertexNormalBuffer.itemSize = 3;
-                modelVertexNormalBuffer.numItems = modelData.vertexNormals.length / 3;
+                modelTeapotVertexNormalBuffer.itemSize = 3;
+                modelTeapotVertexNormalBuffer.numItems = modelData.vertexNormals.length / 3;
 
-                modelVertexTextureCoordBuffer = gl.createBuffer();
-                gl.bindBuffer(gl.ARRAY_BUFFER, modelVertexTextureCoordBuffer);
+                modelTeapotVertexTextureCoordBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, modelTeapotVertexTextureCoordBuffer);
                 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(modelData.vertexTextureCoords),gl.STATIC_DRAW);
-                modelVertexTextureCoordBuffer.itemSize = 2;
-                modelVertexTextureCoordBuffer.numItems = modelData.vertexTextureCoords.length / 2;
+                modelTeapotVertexTextureCoordBuffer.itemSize = 2;
+                modelTeapotVertexTextureCoordBuffer.numItems = modelData.vertexTextureCoords.length / 2;
                 
-                modelVertexPositionBuffer = gl.createBuffer();
-                gl.bindBuffer(gl.ARRAY_BUFFER, modelVertexPositionBuffer);
+                modelTeapotVertexPositionBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, modelTeapotVertexPositionBuffer);
                 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(modelData.vertexPositions),gl.STATIC_DRAW);
-                modelVertexPositionBuffer.itemSize = 3;
-                modelVertexPositionBuffer.numItems = modelData.vertexPositions.length / 3;
+                modelTeapotVertexPositionBuffer.itemSize = 3;
+                modelTeapotVertexPositionBuffer.numItems = modelData.vertexPositions.length / 3;
 
-                modelVertexIndexBuffer = gl.createBuffer();
-                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, modelVertexIndexBuffer);
+                modelTeapotVertexIndexBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, modelTeapotVertexIndexBuffer);
                 gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(modelData.indices),gl.STATIC_DRAW);
-                modelVertexIndexBuffer.itemSize = 1;
-                modelVertexIndexBuffer.numItems = modelData.indices.length;
+                modelTeapotVertexIndexBuffer.itemSize = 1;
+                modelTeapotVertexIndexBuffer.numItems = modelData.indices.length;
             }
 
             function loadModelTeapod(){
@@ -157,18 +157,49 @@
                 request.open("GET","models/Teapot.json");
                 request.onreadystatechange = function() {
                     if(request.readyState == 4) {                        
-                        handleLoadedModel(JSON.parse(request.responseText));
+                        handleLoadedModelTeapot(JSON.parse(request.responseText));
                     }
                 }
                 request.send();
             }
 
+            var modelLaptopVertexNormalBuffer;
+            var modelLaptopVertexTextureCoordBuffer;
+            var modelLaptopVertexPositionBuffer;
+            var modelLaptopVertexIndexBuffer;
+
+            function handleLoadedModelLaptop(modelData){                
+                modelLaptopVertexNormalBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, modelLaptopVertexNormalBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(modelData.vertexNormals),gl.STATIC_DRAW);
+                modelLaptopVertexNormalBuffer.itemSize = 3;
+                modelLaptopVertexNormalBuffer.numItems = modelData.vertexNormals.length / 3;
+
+                modelLaptopVertexTextureCoordBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, modelLaptopVertexTextureCoordBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(modelData.vertexTextureCoords),gl.STATIC_DRAW);
+                modelLaptopVertexTextureCoordBuffer.itemSize = 2;
+                modelLaptopVertexTextureCoordBuffer.numItems = modelData.vertexTextureCoords.length / 2;
+                
+                modelLaptopVertexPositionBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, modelLaptopVertexPositionBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(modelData.vertexPositions),gl.STATIC_DRAW);
+                modelLaptopVertexPositionBuffer.itemSize = 3;
+                modelLaptopVertexPositionBuffer.numItems = modelData.vertexPositions.length / 3;
+
+                modelLaptopVertexIndexBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, modelLaptopVertexIndexBuffer);
+                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(modelData.indices),gl.STATIC_DRAW);
+                modelLaptopVertexIndexBuffer.itemSize = 1;
+                modelLaptopVertexIndexBuffer.numItems = modelData.indices.length;
+            }
+
             function loadModelLaptop(){
                 var request = new XMLHttpRequest();                
-                request.open("GET","models/Teapot.json");
+                request.open("GET","models/Laptop.json");
                 request.onreadystatechange = function() {
                     if(request.readyState == 4) {                        
-                        handleLoadedModel(JSON.parse(request.responseText));
+                        handleLoadedModelLaptop(JSON.parse(request.responseText));
                     }
                 }
                 request.send();
@@ -212,8 +243,8 @@
             }
             var fov = 45;
             var zNear = 0.1;
-            var zFar = 150.0;
-            var dist = 40.0;
+            var zFar = 2000.0;
+            var dist = 5.0;
             var panx = 0;
             var pany = 0;
 
@@ -230,19 +261,42 @@
                 mat4.identity(viewMatrix);
                 mat4.translate(viewMatrix,[panx, 0, -dist]);                
                 mat4.multiply(viewMatrix, mouseRotationMatrix);
+                mat4.translate(viewMatrix, [2,0,0]);
 
-                if (modelVertexPositionBuffer)
+                if (modelTeapotVertexPositionBuffer)
                 {              
                     //TEAPOT                    
-                    gl.bindBuffer(gl.ARRAY_BUFFER, modelVertexPositionBuffer);
-                    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, modelVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+                    gl.bindBuffer(gl.ARRAY_BUFFER, modelTeapotVertexPositionBuffer);
+                    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, modelTeapotVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-                    gl.bindBuffer(gl.ARRAY_BUFFER, modelVertexTextureCoordBuffer);
-                    gl.vertexAttribPointer(shaderProgram.vertexTexCoordAttribute, modelVertexTextureCoordBuffer.itemSize,gl.FLOAT, false, 0 ,0);
+                    gl.bindBuffer(gl.ARRAY_BUFFER, modelTeapotVertexTextureCoordBuffer);
+                    gl.vertexAttribPointer(shaderProgram.vertexTexCoordAttribute, modelTeapotVertexTextureCoordBuffer.itemSize,gl.FLOAT, false, 0 ,0);
 
-                    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,modelVertexIndexBuffer);                    
+                    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,modelTeapotVertexIndexBuffer);                    
                     sendMatricesToShader();
-                    gl.drawElements(gl.TRIANGLES, modelVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+                    gl.drawElements(gl.TRIANGLES, modelTeapotVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+                    
+                }
+
+                
+                //position matrix
+                mat4.identity(mvMatrix);
+                mat4.multiply(mvMatrix,viewMatrix);
+                mat4.translate(viewMatrix, [-4,0,0]);
+                mat4.scale(viewMatrix,[0.1,0.1,0.1]);
+
+                if (modelLaptopVertexPositionBuffer)
+                {              
+                    //Laptop                    
+                    gl.bindBuffer(gl.ARRAY_BUFFER, modelLaptopVertexPositionBuffer);
+                    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, modelLaptopVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+                    gl.bindBuffer(gl.ARRAY_BUFFER, modelLaptopVertexTextureCoordBuffer);
+                    gl.vertexAttribPointer(shaderProgram.vertexTexCoordAttribute, modelLaptopVertexTextureCoordBuffer.itemSize,gl.FLOAT, false, 0 ,0);
+
+                    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,modelLaptopVertexIndexBuffer);                    
+                    sendMatricesToShader();
+                    gl.drawElements(gl.TRIANGLES, modelLaptopVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
                     
                 }
 
